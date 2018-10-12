@@ -1,0 +1,15 @@
+Scale the minibank service to 5 replicas, and wait until all pods are runninig.
+
+Q1: Make 5 more calls to the /api/account/sessions API using 
+cookie base authorization. What do you observe?
+Q2:Make 5 more call to the /api/account/sessions API using 
+the token that was obtained earlier. What do you observe?
+
+A1: When creating cookies while having 5 replicas, the minibank is only running on one of the sessions, the load balancer will randomize which replica you will currently use, but the stored data from the login info could be on another session, thus denying you access to one of those calls.
+
+A2: As for the token stores other metadata, when you make calls, the load balancer will tell you that no session is running if the minibank is not on that specific replica. If you run the command 5 or more times, you are more likely not to get the authentication, but if you do end up getting the replica running the mini bank, both token and cookie will return you session ID.
+
+Q3: Which one of the authentication methods proves to be more scalable. What modifications can be done to the authentication method that is less scalable (or not scalable at all) in order to improve its scalability.
+
+A3: Definitely token based authentication. The cookie based has to store metadata/information on an active session in the backend/database as well as on the client side/browser, therefore making this authentication stateful. When the user logs out both are destroyed. Even replicating the servers to handle application load wont do much just because we have to store information in session memory which will limit our scalability. As for a Token based authentication, it request a token from the server, then store the token info locally on the client side. The server does not keep record of which users are logged in or which tokens that have been issued, while the cookie kept check of active sessions in a database, therefore making the token based authentication stateless and more scalable because there is less work to do on the server side. If cookies can have a lookup table that stores all the passwords and usernames. It will be able to access an account quicker if a user decides to login, making it more scalable. 
+
